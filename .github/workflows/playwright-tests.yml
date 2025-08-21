@@ -1,12 +1,12 @@
-name: Playwright E2E Tests
+name: Playwright E2E Tests by Environment
 
 on:
   push:
     branches:
-      - develop          # Dev environment
-      - release/staging  # Staging environment
-      - release/uat      # UAT environment
-  workflow_dispatch:      # Allow manual run
+      - develop
+      - release/staging
+      - release/uat
+  workflow_dispatch:
 
 jobs:
   e2e-tests:
@@ -31,11 +31,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
           pip install -r PythonProject/e2e/requirements.txt
           playwright install --with-deps
 
+      - name: Detect test suite
+        id: suite
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "develop" ]]; then
+            echo "suite=dev" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF##*/}" == "release/staging" ]]; then
+            echo "suite=staging" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF##*/}" == "release/uat" ]]; then
+            echo "suite=uat" >> $GITHUB_OUTPUT
+          else
+            echo "suite=dev" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run Playwright Tests
         run: |
-          echo "Running tests against: $BASE_URL"
-          pytest PythonProject/e2e/tests --base-url="$BASE_URL" -v
+          echo "Running tests from PythonProject/e2e/tests/${{ steps.suite.outputs.suite }}"
+          pytest PythonProject/e2e/tests/${{ steps.suite.outputs.suite }} -v --base-url="$BASE_URL"
