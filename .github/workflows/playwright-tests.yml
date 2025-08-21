@@ -50,4 +50,6 @@ jobs:
       - name: Run Playwright Tests
         run: |
           echo "Running tests from PythonProject/e2e/tests/${{ steps.suite.outputs.suite }}"
-          pytest PythonProject/e2e/tests/${{ steps.suite.outputs.suite }} -v --base-url="$BASE_URL"
+          pytest PythonProject/e2e/tests/${{ steps.suite.outputs.suite }} \
+          --base-url="$BASE_URL" -v
+
