@@ -3,7 +3,7 @@ name: Playwright E2E Tests by Environment
 on:
   push:
     branches:
-      - develop
+      - origin/dev
       - release/staging
       - release/uat
   workflow_dispatch:
