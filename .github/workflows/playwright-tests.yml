@@ -17,8 +17,7 @@ jobs:
         github.ref == 'refs/heads/develop' && vars.DEV_URL || 
         github.ref == 'refs/heads/release/staging' && vars.STAGING_URL || 
         github.ref == 'refs/heads/release/uat' && vars.UAT_URL || 
-        'https://default-url.com'
-      }}
+        'https://default-url.com' }}
 
     steps:
       - name: Checkout code
