@@ -1,0 +1,41 @@
+name: Playwright E2E Tests
+
+on:
+  push:
+    branches:
+      - develop          # Dev environment
+      - release/staging  # Staging environment
+      - release/uat      # UAT environment
+  workflow_dispatch:      # Allow manual run
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      BASE_URL: ${{ 
+        github.ref == 'refs/heads/develop' && vars.DEV_URL || 
+        github.ref == 'refs/heads/release/staging' && vars.STAGING_URL || 
+        github.ref == 'refs/heads/release/uat' && vars.UAT_URL || 
+        'https://default-url.com'
+      }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r PythonProject/e2e/requirements.txt
+          playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: |
+          echo "Running tests against: $BASE_URL"
+          pytest PythonProject/e2e/tests --base-url="$BASE_URL" -v
